@@ -74,18 +74,18 @@
     <result name="success">/index.jsp</result>
 </action>
 <action name="addProject" class="com.example.action.AddProjectAction" method="execute">
-    <result name="success">/project_success.jsp</result>
-    <result name="input">/add_project.jsp</result>
+    <result name="success">project_success.jsp</result>
+    <result name="input">add_Project.jsp</result>
 </action>
 
 <action name="viewProjects" class="com.example.action.ViewProjectsAction" method="execute">
-    <result name="success">/view_projects.jsp</result>
+    <result name="success">view_projects.jsp</result>
 </action>
 
 <!-- optional edit/delete actions - implement if needed -->
 <action name="deleteProject" class="com.example.action.DeleteProjectAction" method="execute">
     <result name="success" type="redirect">viewProjects</result>
-    <result name="input">/view_projects.jsp</result>
+    <result name="input">view_projects.jsp</result>
 </action>
 
 

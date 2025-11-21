@@ -70,8 +70,11 @@
     <bean id="deleteEmployeeAction" class="com.example.action.DeleteEmployeeAction" scope="prototype"/>
     <!-- add this inside <beans> ... -->
 <bean id="loginEmployeeAction" class="com.example.action.LoginEmployeeAction" scope="prototype">
+
     <!-- ref should match the employee service bean id in Spring context -->
     <property name="employeeService" ref="employeeService"/>
 </bean>
-
+<bean id="addProjectAction" class="com.example.action.AddProjectAction" scope="prototype">
+    <property name="projectService" ref="projectService"/>
+</bean>
 </beans>
