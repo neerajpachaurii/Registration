@@ -1,0 +1,77 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context.xsd
+          http://www.springframework.org/schema/tx
+          http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- Enable Annotations -->
+    <context:annotation-config/>
+    <context:component-scan base-package="com.example"/>
+
+    <!-- ====================== DB CONFIG ====================== -->
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/employee_db"/>
+        <property name="username" value="root"/>
+        <property name="password" value="Root@123"/>
+    </bean>
+
+    <!-- ====================== Hibernate Session Factory ====================== -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="com.example.model"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- ====================== Transaction Manager ====================== -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <tx:annotation-driven/>
+
+    <!-- ====================== USER MODULE (AS IT IS) ====================== -->
+
+    <bean id="userDAO" class="com.example.dao.UserDAO">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean id="userService" class="com.example.service.UserServiceImpl">
+        <property name="userDAO" ref="userDAO"/>
+    </bean>
+
+    <bean id="registrationAction" class="com.example.action.RegistrationAction">
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <bean id="loginAction" class="com.example.action.LoginAction">
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <bean id="addEmployeeAction" class="com.example.action.AddEmployeeAction" scope="prototype"/>
+  <!--   <bean id="viewEmployeeAction" class="com.example.action.ViewEmployeeAction" scope="prototype"/> -->
+  <bean id="viewEmployeeAction" class="com.example.action.ViewEmployeeAction" scope="prototype">
+    <property name="service" ref="employeeService"/>
+</bean>
+    <bean id="editEmployeeAction" class="com.example.action.EditEmployeeAction" scope="prototype"/>
+    <bean id="updateEmployeeAction" class="com.example.action.UpdateEmployeeAction" scope="prototype"/>
+    <bean id="deleteEmployeeAction" class="com.example.action.DeleteEmployeeAction" scope="prototype"/>
+    <!-- add this inside <beans> ... -->
+<bean id="loginEmployeeAction" class="com.example.action.LoginEmployeeAction" scope="prototype">
+    <!-- ref should match the employee service bean id in Spring context -->
+    <property name="employeeService" ref="employeeService"/>
+</bean>
+
+</beans>
