@@ -71,7 +71,7 @@
     <h2>Welcome, <%= ((com.example.model.Employee)o).getName() %></h2>
     <p>Your dashboard is ready.</p>
     
-    <a href="add_project.jsp" class="btn btn-success">Add Project</a>
+    <a href="add_Project.jsp" class="btn btn-success">Add Project</a>
 <a href="viewProjects" class="btn btn-secondary">My Projects</a>
 </div>
 

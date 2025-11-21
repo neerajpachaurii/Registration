@@ -38,7 +38,7 @@
       </tbody>
     </table>
 
-    <a href="add_project.jsp" class="btn btn-success">Add Project</a>
+    <a href="add_Project.jsp" class="btn btn-success">Add Project</a>
   </div>
 </div>
 </body>

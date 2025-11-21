@@ -48,6 +48,13 @@ public class AddProjectAction extends ActionSupport {
             return LOGIN;
         }
 
+        if (project.getTitle() == null || project.getTitle().trim().isEmpty()
+        		 || project.getDescription() == null || project.getDescription().trim().isEmpty()) {
+
+        		    addActionError("Please fill all required fields before submitting!");
+        		    return INPUT;
+        		}
+
         // handle file upload if present
         String savedPath = null;
         if (upload != null) {
