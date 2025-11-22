@@ -25,6 +25,7 @@ public class UserDAO {
         q.setParameter("uname", username);
         return q.uniqueResult() != null;
     }
+
     public User findByUsername(String username) {
         Session session = sessionFactory.getCurrentSession();
         Query q = session.createQuery("FROM User WHERE username = :uname");

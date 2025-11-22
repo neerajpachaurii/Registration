@@ -2,8 +2,8 @@ package com.example.action;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.example.service.EmployeeService;
 import com.opensymphony.xwork2.ActionSupport;
+import com.example.service.EmployeeService;
 
 public class DeleteEmployeeAction extends ActionSupport {
 
@@ -12,11 +12,10 @@ public class DeleteEmployeeAction extends ActionSupport {
 
     private int id;
 
+    public void setId(int id){ this.id = id; }
+
     public String execute() {
         service.delete(id);
         return SUCCESS;
     }
-
-    public void setId(int id) { this.id = id; }
 }
-

@@ -3,6 +3,8 @@ package com.example.model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name="project")
@@ -14,11 +16,11 @@ public class Project implements Serializable {
 
     private String title;
 
-    @Column(length=2000)
+    @Column(length = 2000)
     private String description;
 
-    private String filename;   // original filename
-    private String filepath;   // server path where file saved
+    private String filename;
+    private String filepath;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt = new Date();
@@ -27,7 +29,14 @@ public class Project implements Serializable {
     @JoinColumn(name = "owner_id")
     private Employee owner;
 
-    // getters & setters
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "project_user_access",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id")
+    )
+    private Set<Employee> allowedUsers = new HashSet<Employee>();
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -48,4 +57,7 @@ public class Project implements Serializable {
 
     public Employee getOwner() { return owner; }
     public void setOwner(Employee owner) { this.owner = owner; }
+
+    public Set<Employee> getAllowedUsers() { return allowedUsers; }
+    public void setAllowedUsers(Set<Employee> allowedUsers) { this.allowedUsers = allowedUsers; }
 }
