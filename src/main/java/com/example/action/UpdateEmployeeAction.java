@@ -2,9 +2,9 @@ package com.example.action;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.opensymphony.xwork2.ActionSupport;
 import com.example.model.Employee;
 import com.example.service.EmployeeService;
-import com.opensymphony.xwork2.ActionSupport;
 
 public class UpdateEmployeeAction extends ActionSupport {
 
@@ -13,12 +13,11 @@ public class UpdateEmployeeAction extends ActionSupport {
 
     private Employee employee;
 
+    public void setEmployee(Employee e){ this.employee = e; }
+    public Employee getEmployee(){ return employee; }
+
     public String execute() {
         service.update(employee);
         return SUCCESS;
     }
-    
-
-    public Employee getEmployee() { return employee; }
-    public void setEmployee(Employee employee) { this.employee = employee; }
 }

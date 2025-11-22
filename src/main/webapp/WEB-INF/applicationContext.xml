@@ -26,6 +26,7 @@
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"/>
         <property name="packagesToScan" value="com.example.model"/>
+
         <property name="hibernateProperties">
             <props>
                 <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
@@ -42,8 +43,52 @@
 
     <tx:annotation-driven/>
 
-    <!-- ====================== USER MODULE (AS IT IS) ====================== -->
+    <!-- ====================== EMPLOYEE MODULE ====================== -->
 
+    <!-- DAO -->
+    <bean id="employeeDAO" class="com.example.dao.EmployeeDAOImpl">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- SERVICE -->
+    <bean id="employeeService" class="com.example.service.EmployeeServiceImpl">
+        <property name="dao" ref="employeeDAO"/>
+    </bean>
+
+    <!-- ACTIONS -->
+    <bean id="addEmployeeAction" class="com.example.action.AddEmployeeAction" scope="prototype"/>
+    
+    <bean id="viewEmployeeAction" class="com.example.action.ViewEmployeeAction" scope="prototype">
+        <property name="service" ref="employeeService"/>
+    </bean>
+
+    <bean id="editEmployeeAction" class="com.example.action.EditEmployeeAction" scope="prototype"/>
+    <bean id="updateEmployeeAction" class="com.example.action.UpdateEmployeeAction" scope="prototype"/>
+    <bean id="deleteEmployeeAction" class="com.example.action.DeleteEmployeeAction" scope="prototype"/>
+
+    <bean id="loginEmployeeAction" class="com.example.action.LoginEmployeeAction" scope="prototype">
+        <property name="employeeService" ref="employeeService"/>
+    </bean>
+
+
+    <!-- ====================== PROJECT MODULE ====================== -->
+    <bean id="projectDAO" class="com.example.dao.ProjectDAOImpl">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean id="projectService" class="com.example.service.ProjectServiceImpl">
+        <property name="dao" ref="projectDAO"/>
+    </bean>
+
+    <bean id="addProjectAction" class="com.example.action.AddProjectAction" scope="prototype">
+        <property name="projectService" ref="projectService"/>
+    </bean>
+
+<bean id="viewProjectsAction" class="com.example.action.ViewProjectsAction" scope="prototype">
+    <property name="projectService" ref="projectService"/>
+</bean>
+
+    <!-- ====================== USER MODULE ====================== -->
     <bean id="userDAO" class="com.example.dao.UserDAO">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
@@ -60,21 +105,4 @@
         <property name="userService" ref="userService"/>
     </bean>
 
-    <bean id="addEmployeeAction" class="com.example.action.AddEmployeeAction" scope="prototype"/>
-  <!--   <bean id="viewEmployeeAction" class="com.example.action.ViewEmployeeAction" scope="prototype"/> -->
-  <bean id="viewEmployeeAction" class="com.example.action.ViewEmployeeAction" scope="prototype">
-    <property name="service" ref="employeeService"/>
-</bean>
-    <bean id="editEmployeeAction" class="com.example.action.EditEmployeeAction" scope="prototype"/>
-    <bean id="updateEmployeeAction" class="com.example.action.UpdateEmployeeAction" scope="prototype"/>
-    <bean id="deleteEmployeeAction" class="com.example.action.DeleteEmployeeAction" scope="prototype"/>
-    <!-- add this inside <beans> ... -->
-<bean id="loginEmployeeAction" class="com.example.action.LoginEmployeeAction" scope="prototype">
-
-    <!-- ref should match the employee service bean id in Spring context -->
-    <property name="employeeService" ref="employeeService"/>
-</bean>
-<bean id="addProjectAction" class="com.example.action.AddProjectAction" scope="prototype">
-    <property name="projectService" ref="projectService"/>
-</bean>
 </beans>

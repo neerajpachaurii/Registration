@@ -4,90 +4,83 @@
 
 <struts>
 
-  <!-- Enable Spring for Struts Actions -->
-  <constant name="struts.objectFactory" value="spring" />
-  <constant name="struts.devMode" value="true"/>
+    <!-- Allow Spring to manage Struts actions -->
+    <constant name="struts.objectFactory" value="spring" />
+    <constant name="struts.devMode" value="false"/>
 
-  <package name="default" namespace="/" extends="struts-default">
-
-    <!-- USER MODULE -->
-    <action name="registrationPage">
-      <result>registration.jsp</result>
-    </action>
-
-    <action name="register" class="registrationAction" method="execute">
-      <result name="success">success.jsp</result>
-      <result name="input">registration.jsp</result>
-      <result name="error">error.jsp</result>
-    </action>
-
-    <action name="loginPage">
-      <result>login.jsp</result>
-    </action>
-
-    <action name="login" class="loginAction" method="execute">
-      <result name="success">success.jsp</result>
-      <result name="input">login.jsp</result>
-      <result name="register_first">error.jsp</result>
-      <result name="error">error.jsp</result>
-    </action>
+    <package name="default" namespace="/" extends="struts-default">
 
 
-    <!-- EMPLOYEE CRUD MODULE -->
+        <action name="loginEmployee" class="com.example.action.LoginEmployeeAction">
+            <result name="success">employee_welcome.jsp</result>
+            <result name="adminHome">admin_home.jsp</result>
+            <result name="employeeHome">employee_home.jsp</result>
+            <result name="input">loginEmployee.jsp</result>
+            <result name="register_first">addEmployee.jsp</result>
+        </action>
 
-    <action name="addEmployee" class="addEmployeeAction" method="execute">
-        <result name="success">employee_success.jsp</result>
-        <result name="input">addEmployee.jsp</result>
-    </action>
+        <action name="logoutEmployee" class="com.example.action.LogoutEmployeeAction">
+            <result name="success">/index.jsp</result>
+        </action>
 
-    <action name="viewEmployees" class="viewEmployeeAction" method="execute">
-        <result name="success">viewEmployee.jsp</result>
-         <result name="login">/loginEmployee.jsp</result>
-    <result name="error">/error.jsp</result>
-    </action>
+        <action name="addEmployee" class="com.example.action.AddEmployeeAction">
+            <result name="success">employee_success.jsp</result>
+            <result name="input">addEmployee.jsp</result>
+        </action>
 
-    <action name="editEmployee" class="editEmployeeAction" method="execute">
-        <result name="success">editEmployee.jsp</result>
-        <result name="input">editEmployee.jsp</result>
-    <result name="accessDenied">error.jsp</result> 
-    <result name="login">loginEmployee.jsp</result>
-    </action>
+        <action name="viewEmployees" class="com.example.action.ViewEmployeeAction">
+            <result name="success">viewEmployee.jsp</result>
+            <result name="login">loginEmployee.jsp</result>
+        </action>
 
-    <action name="updateEmployee" class="updateEmployeeAction" method="execute">
-   <result name="success" type="redirect">viewEmployees</result>
-    </action>
+        <action name="editEmployee" class="com.example.action.EditEmployeeAction">
+            <result name="success">editEmployee.jsp</result>
+            <result name="input">editEmployee.jsp</result>
+            <result name="accessDenied">error.jsp</result>
+            <result name="login">loginEmployee.jsp</result>
+        </action>
 
-    <action name="deleteEmployee" class="deleteEmployeeAction" method="execute">
-        <result name="success" type="redirect">viewEmployees</result>
-    </action>
-    
-    <action name="loginEmployee" class="com.example.action.LoginEmployeeAction">
-    <result name="success">employee_welcome.jsp</result>
-    <result name="input">loginEmployee.jsp</result>
-    <result name="register_first">addEmployee.jsp</result>
-    
-    <result name="adminHome">admin_home.jsp</result>
-    <result name="employeeHome">employee_home.jsp</result>
-   
-</action>
-<action name="logoutEmployee" class="com.example.action.LogoutEmployeeAction">
-    <result name="success">/index.jsp</result>
-</action>
-<action name="addProject" class="com.example.action.AddProjectAction" method="execute">
-    <result name="success">project_success.jsp</result>
-    <result name="input">add_Project.jsp</result>
-</action>
+        <action name="updateEmployee" class="com.example.action.UpdateEmployeeAction">
+            <result name="success" type="redirect">viewEmployees</result>
+        </action>
 
-<action name="viewProjects" class="com.example.action.ViewProjectsAction" method="execute">
-    <result name="success">view_projects.jsp</result>
-</action>
+        <action name="deleteEmployee" class="com.example.action.DeleteEmployeeAction">
+            <result name="success" type="redirect">viewEmployees</result>
+        </action>
 
-<!-- optional edit/delete actions - implement if needed -->
-<action name="deleteProject" class="com.example.action.DeleteProjectAction" method="execute">
-    <result name="success" type="redirect">viewProjects</result>
-    <result name="input">view_projects.jsp</result>
-</action>
+        <action name="addProject" class="com.example.action.AddProjectAction">
+            <result name="success">project_success.jsp</result>
+            <result name="input">add_Project.jsp</result>
+        </action>
+
+        <action name="viewProjects" class="com.example.action.ViewProjectsAction">
+            <result name="success">employee_home.jsp</result>
+            <result name="login">loginEmployee.jsp</result>
+        </action>
+      
+       <action name="assignProjectAccessPage"
+                class="com.example.action.AssignProjectAccessAction"
+                method="input">
+            <result name="input">manage_access.jsp</result>
+            <result name="accessDenied">error.jsp</result>
+        </action>
+
+        <action name="assignProjectAccess"
+                class="com.example.action.AssignProjectAccessAction"
+                method="execute">
+            <result name="success" type="redirect">viewProjects</result>
+            <result name="accessDenied">error.jsp</result>
+        </action>
+      
+        
+
+        <action name="deleteProject" class="com.example.action.DeleteProjectAction">
+            <result name="success" type="redirect">viewProjects</result>
+        </action>
+     
 
 
-  </package>
+
+    </package>
+
 </struts>

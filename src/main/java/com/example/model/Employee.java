@@ -1,38 +1,11 @@
-//package com.example.model;
-//
-//import javax.persistence.Entity;
-//import javax.persistence.GeneratedValue;
-//import javax.persistence.GenerationType;
-//import javax.persistence.Id;
-//import javax.persistence.Table;
-//
-//@Entity
-//@Table(name= "employee")
-//public class Employee 
-//{
-//	@Id
-//	@GeneratedValue(strategy = GenerationType.IDENTITY)
-//	private int id;
-//	
-//	private String name;
-//	private String email;
-//	private String department;
-//	private String address;
-//	private String country;
-//	private String father_name;
-//	private String mother_name;
-//}
 package com.example.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name= "employee")
+@Table(name = "employee")
 public class Employee {
 
     @Id
@@ -51,17 +24,15 @@ public class Employee {
     private String mother_name;
     private double expenses;
     private double salary;
-    
+
     @Column(name="role")
-    private String role;  // ADMIN or USER
+    private String role;
 
-    public String getRole() {
-        return role;
-    }
+    @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
+    private Set<Project> ownedProjects = new HashSet<Project>();
 
-    public void setRole(String role) {
-        this.role = role;
-    }
+    @ManyToMany(mappedBy = "allowedUsers", fetch = FetchType.LAZY)
+    private Set<Project> sharedProjects = new HashSet<Project>();
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -98,4 +69,13 @@ public class Employee {
 
     public double getSalary() { return salary; }
     public void setSalary(double salary) { this.salary = salary; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
+    public Set<Project> getOwnedProjects() { return ownedProjects; }
+    public void setOwnedProjects(Set<Project> ownedProjects) { this.ownedProjects = ownedProjects; }
+
+    public Set<Project> getSharedProjects() { return sharedProjects; }
+    public void setSharedProjects(Set<Project> sharedProjects) { this.sharedProjects = sharedProjects; }
 }

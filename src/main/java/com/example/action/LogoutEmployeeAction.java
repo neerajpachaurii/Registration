@@ -7,10 +7,11 @@ import java.util.Map;
 
 public class LogoutEmployeeAction extends ActionSupport {
 
-    @Override
     public String execute() {
-        Map<String,Object> session = ActionContext.getContext().getSession();
+
+        Map session = ActionContext.getContext().getSession();
         session.remove("loggedEmployee");
-        return SUCCESS; // map success to index.jsp or login
+
+        return SUCCESS;
     }
 }

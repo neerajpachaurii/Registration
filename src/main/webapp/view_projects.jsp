@@ -2,43 +2,75 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8"/>
   <title>Projects</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"/>
 </head>
+
 <body class="bg-light">
 <div class="container mt-4">
   <div class="card p-4 shadow">
+
     <h4>Projects</h4>
 
-    <table class="table">
+    <table class="table table-striped">
       <thead>
-        <tr><th>Title</th><th>Description</th><th>Owner</th><th>File</th><th>Actions</th></tr>
+        <tr>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Owner</th>
+          <th>File</th>
+          <th>Actions</th>
+        </tr>
       </thead>
+
       <tbody>
         <s:iterator value="projects" var="p">
+
           <tr>
             <td><s:property value="#p.title"/></td>
-            <td style="max-width:400px; white-space:pre-wrap;"><s:property value="#p.description"/></td>
+
+            <td style="max-width:300px; white-space:pre-wrap;">
+              <s:property value="#p.description"/>
+            </td>
+
             <td><s:property value="#p.owner.name"/></td>
+
             <td>
               <s:if test="#p.filepath != null">
-                <a href="<s:property value='#p.filepath'/>" target="_blank">Download</a>
+                <a href="<%=request.getContextPath()%>/<s:property value='#p.filepath'/>" target="_blank">
+                  Download
+                </a>
               </s:if>
             </td>
+
             <td>
-              <!-- If owner or admin, allow delete/edit (you can add actions) -->
-              <s:if test="#session.loggedEmployee.role == 'ADMIN' or #session.loggedEmployee.id == #p.owner.id">
-                 <a href="editProject?id=<s:property value='#p.id'/>" class="btn btn-sm btn-outline-primary">Edit</a>
-                 <a href="deleteProject?id=<s:property value='#p.id'/>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete?')">Delete</a>
+
+              <!-- ADMIN manage access -->
+              <s:if test="#session.loggedEmployee.role == 'ADMIN'">
+                <a href="assignProjectAccessPage?projectId=<s:property value='#p.id'/>"
+   class="btn btn-sm btn-outline-secondary">Manage Access</a>
+
               </s:if>
+
+              <!-- Owner or Admin can delete -->
+              <s:if test="#session.loggedEmployee.role == 'ADMIN' || #session.loggedEmployee.id == #p.owner.id">
+                <a href="deleteProject?id=<s:property value='#p.id'/>" 
+                   class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Delete this project?');">
+                  Delete
+                </a>
+              </s:if>
+
             </td>
           </tr>
+
         </s:iterator>
       </tbody>
+
     </table>
 
     <a href="add_Project.jsp" class="btn btn-success">Add Project</a>
+
   </div>
 </div>
 </body>
