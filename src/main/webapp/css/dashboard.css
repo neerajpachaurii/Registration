@@ -1,0 +1,5 @@
+/* webapp/css/dashboard.css */
+.table-scroll { max-height: 520px; overflow:auto; }
+.highlight { background: #fff3b0; padding: 0 2px; border-radius: 2px; }
+.search-panel { display:flex; flex-wrap:wrap; align-items:flex-end; }
+.search-panel .col-auto { margin-right: 8px; }
