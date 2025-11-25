@@ -25,6 +25,9 @@ public class Employee {
     private double expenses;
     private double salary;
 
+    private String status;
+    
+    
     @Column(name="role")
     private String role;
 
@@ -72,6 +75,9 @@ public class Employee {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     public Set<Project> getOwnedProjects() { return ownedProjects; }
     public void setOwnedProjects(Set<Project> ownedProjects) { this.ownedProjects = ownedProjects; }

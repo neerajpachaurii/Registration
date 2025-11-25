@@ -66,6 +66,12 @@
 			<result name="login">loginEmployee.jsp</result>
 			<result name="accessDenied">error.jsp</result>
 		</action>
+		<action name="employeeDashboard"
+			class="com.example.action.EmployeeDashboardAction">
+			<result name="success">employee_home.jsp</result>
+			<result name="login">loginEmployee.jsp</result>
+		</action>
+
 
 
 
@@ -73,7 +79,7 @@
 			class="com.example.action.ViewProjectsAction">
 			<!-- <result name="success">employee_home.jsp</result> -->
 			<result name="success">view_projects.jsp</result>
-			
+
 			<result name="login">loginEmployee.jsp</result>
 		</action>
 
@@ -83,16 +89,58 @@
 			<result name="accessDenied">error.jsp</result>
 		</action>
 
+
 		<action name="assignProjectAccess"
-			class="com.example.action.AssignProjectAccessAction" method="execute">
+			class="com.example.action.AssignProjectAction" method="execute">
 			<result name="success" type="redirect">viewProjects</result>
+			<result name="input">manage_access.jsp</result>
+			<result name="error">error.jsp</result>
 			<result name="accessDenied">error.jsp</result>
 		</action>
 
+		<action name="updateEmployeeStatus"
+			class="com.example.action.UpdateEmployeeStatusAction">
+
+			<result name="success" type="redirectAction">
+				<param name="actionName">adminDashboard</param>
+			</result>
+
+			<result name="accessDenied">/error.jsp</result>
+			<result name="error">/error.jsp</result>
+		</action>
 		<action name="deleteProject"
 			class="com.example.action.DeleteProjectAction">
 			<result name="success" type="redirect">viewProjects</result>
 		</action>
+
+		<action name="downloadProjectFile"
+			class="com.example.action.DownloadProjectFileAction">
+			<result name="success" type="stream">
+				<param name="contentType">application/octet-stream</param>
+				<param name="inputName">fileInputStream</param>
+				<param name="contentDisposition">
+					attachment;filename="${downloadFileName}"
+				</param>
+				<param name="bufferSize">1024</param>
+			</result>
+
+			<result name="error">/error.jsp</result>
+		</action>
+
+		<action name="exportEmployees"
+			class="com.example.action.AdminDashboardAction"
+			method="exportToExcel">
+
+			<result name="excel" type="stream">
+				<param name="contentType">application/vnd.ms-excel</param>
+				<param name="contentDisposition"> attachment;filename=employees_data.xls </param>
+				<param name="inputName">inputStream</param>
+				<param name="bufferSize">1024</param>
+			</result>
+
+			<result name="error">/error.jsp</result>
+		</action>
+
 
 	</package>
 

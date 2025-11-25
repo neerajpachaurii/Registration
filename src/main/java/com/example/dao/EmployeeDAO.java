@@ -12,4 +12,6 @@ public interface EmployeeDAO {
 
     Employee findByUsername(String username);
     boolean employeeExists(String username);
+    void updateStatus(int id, String status);
+
 }

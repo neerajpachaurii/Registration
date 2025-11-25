@@ -1,25 +1,36 @@
 package com.example.action;
 
-import com.opensymphony.xwork2.ActionSupport;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.struts2.ServletActionContext;
+
 import com.example.model.Employee;
 import com.example.model.Project;
 import com.example.service.EmployeeService;
 import com.example.service.ProjectService;
-import com.opensymphony.xwork2.ActionContext;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.opensymphony.xwork2.ActionSupport;
 
 public class AdminDashboardAction extends ActionSupport {
 
 	private EmployeeService employeeService;
 	private ProjectService projectService;
 
+	public void setEmployeeService(EmployeeService s) {
+		this.employeeService = s;
+	}
+
+	public void setProjectService(ProjectService s) {
+		this.projectService = s;
+	}
+
+	// OUTPUT LISTS
 	private List<Employee> employees;
 	private List<Project> projects;
 
-	// SEARCH FIELDS
+	// SEARCH INPUTS
 	private String searchTitle;
 	private String searchOwner;
 	private String searchDept;
@@ -27,15 +38,14 @@ public class AdminDashboardAction extends ActionSupport {
 
 	// PAGINATION
 	private int page = 1;
-	private int pageSize = 10;
+	private int pageSize = 5;
 	private int totalPages;
 
-	public void setEmployeeService(EmployeeService s) {
-		this.employeeService = s;
-	}
+	// Stream for Excel export (Struts stream result will use this)
+	private InputStream inputStream;
 
-	public void setProjectService(ProjectService p) {
-		this.projectService = p;
+	public InputStream getInputStream() {
+		return inputStream;
 	}
 
 	public List<Employee> getEmployees() {
@@ -44,26 +54,6 @@ public class AdminDashboardAction extends ActionSupport {
 
 	public List<Project> getProjects() {
 		return projects;
-	}
-
-	public int getPage() {
-		return page;
-	}
-
-	public void setPage(int page) {
-		this.page = page;
-	}
-
-	public int getPageSize() {
-		return pageSize;
-	}
-
-	public void setPageSize(int p) {
-		this.pageSize = p;
-	}
-
-	public int getTotalPages() {
-		return totalPages;
 	}
 
 	public void setSearchTitle(String s) {
@@ -82,86 +72,152 @@ public class AdminDashboardAction extends ActionSupport {
 		this.searchEmail = s;
 	}
 
+	public void setPage(int page) {
+		this.page = page;
+	}
+
+	public int getPage() {
+		return page;
+	}
+
+	public int getTotalPages() {
+		return totalPages;
+	}
+
 	@Override
-	public String execute() {
+	public String execute() throws Exception {
 
-		Map<String, Object> session = ActionContext.getContext().getSession();
-		Employee admin = (Employee) session.get("loggedEmployee");
+		Employee admin = (Employee) ServletActionContext.getRequest().getSession().getAttribute("loggedEmployee");
 
-		if (admin == null)
-			return LOGIN;
-		if (!"ADMIN".equalsIgnoreCase(admin.getRole()))
-			return "accessDenied";
+		if (admin == null || !"ADMIN".equals(admin.getRole())) {
+			return "login";
+		}
 
+		// LOAD ALL
 		List<Project> allProjects = projectService.getAllProjects();
 		List<Employee> allEmployees = employeeService.getAll();
-		projects = new ArrayList<Project>();
+
+		if (allProjects == null)
+			allProjects = new ArrayList<Project>();
+		if (allEmployees == null)
+			allEmployees = new ArrayList<Employee>();
+
+		// FILTER PROJECTS
+		List<Project> filteredProjects = new ArrayList<Project>();
 		for (Project p : allProjects) {
+			boolean match = true;
 
-			boolean ok = true;
-
-			if (searchTitle != null && searchTitle.trim().length() > 0) {
+			if (searchTitle != null && !"".equals(searchTitle.trim())) {
 				if (p.getTitle() == null || !p.getTitle().toLowerCase().contains(searchTitle.toLowerCase())) {
-					ok = false;
+					match = false;
 				}
 			}
 
-			if (ok && searchOwner != null && searchOwner.trim().length() > 0) {
-				if (p.getOwner() == null || p.getOwner().getName() == null
-						|| !p.getOwner().getName().toLowerCase().contains(searchOwner.toLowerCase())) {
-					ok = false;
+			if (searchOwner != null && !"".equals(searchOwner.trim())) {
+				String owner = (p.getOwner() != null) ? p.getOwner().getName() : "";
+				if (owner == null || !owner.toLowerCase().contains(searchOwner.toLowerCase())) {
+					match = false;
 				}
 			}
 
-			if (ok) {
-				projects.add(p);
+			if (match) {
+				filteredProjects.add(p);
 			}
 		}
-		employees = new ArrayList<Employee>();
+
+		// FILTER EMPLOYEES
+		List<Employee> filteredEmployees = new ArrayList<Employee>();
 		for (Employee e : allEmployees) {
+			boolean match = true;
 
-			boolean ok = true;
-
-			if (searchDept != null && searchDept.trim().length() > 0) {
+			if (searchDept != null && !"".equals(searchDept.trim())) {
 				if (e.getDepartment() == null || !e.getDepartment().toLowerCase().contains(searchDept.toLowerCase())) {
-					ok = false;
+					match = false;
 				}
 			}
 
-			if (ok && searchEmail != null && searchEmail.trim().length() > 0) {
+			if (searchEmail != null && !"".equals(searchEmail.trim())) {
 				if (e.getEmail() == null || !e.getEmail().toLowerCase().contains(searchEmail.toLowerCase())) {
-					ok = false;
+					match = false;
 				}
 			}
 
-			if (ok) {
-				employees.add(e);
+			if (match) {
+				filteredEmployees.add(e);
 			}
 		}
-		int total = projects.size();
-		totalPages = (int) Math.ceil((double) total / pageSize);
 
+		// PAGINATION
+		int total = filteredProjects.size();
+		totalPages = (total + pageSize - 1) / pageSize;
 		if (totalPages == 0)
 			totalPages = 1;
-
 		if (page < 1)
 			page = 1;
 		if (page > totalPages)
 			page = totalPages;
 
 		int start = (page - 1) * pageSize;
-		int end = start + pageSize;
+		int end = Math.min(start + pageSize, total);
 
-		if (end > total)
-			end = total;
-
-		List<Project> paginated = new ArrayList<Project>();
-		for (int i = start; i < end; i++) {
-			paginated.add(projects.get(i));
+		// handle case when filteredProjects is empty or start==end
+		if (start >= 0 && end >= start && !filteredProjects.isEmpty()) {
+			projects = filteredProjects.subList(start, end);
+		} else {
+			projects = new ArrayList<Project>();
 		}
 
-		projects = paginated;
+		employees = filteredEmployees;
 
 		return SUCCESS;
+	}
+
+	public String exportToExcel() {
+		try {
+			// Session check
+			Employee admin = (Employee) ServletActionContext.getRequest().getSession().getAttribute("loggedEmployee");
+
+			if (admin == null || !"ADMIN".equals(admin.getRole())) {
+				addActionError("Access Denied");
+				return ERROR;
+			}
+
+			// Load all employees from service
+			employees = employeeService.getAll();
+
+			if (employees == null || employees.isEmpty()) {
+				addActionError("No Employee Data Found to Export");
+				return ERROR;
+			}
+
+			StringBuilder sb = new StringBuilder();
+
+			// Header
+			sb.append("ID\tName\tEmail\tDepartment\tSalary\tStatus\tRole\n");
+
+			for (Employee e : employees) {
+				sb.append(nullSafeString(e.getId())).append("\t").append(nullSafeString(e.getName())).append("\t")
+						.append(nullSafeString(e.getEmail())).append("\t").append(nullSafeString(e.getDepartment()))
+						.append("\t").append(nullSafeString(e.getSalary())).append("\t")
+						.append(nullSafeString(e.getStatus())).append("\t").append(nullSafeString(e.getRole()))
+						.append("\n");
+			}
+
+			byte[] bytes = sb.toString().getBytes("UTF-8");
+			inputStream = new ByteArrayInputStream(bytes);
+
+			// Struts stream result will use getInputStream()
+			return "excel";
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			addActionError("Error exporting data: " + e.getMessage());
+			return ERROR;
+		}
+	}
+
+	// helper: avoid NPE while appending
+	private String nullSafeString(Object o) {
+		return (o == null) ? "" : o.toString();
 	}
 }

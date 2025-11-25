@@ -1,180 +1,98 @@
-//package com.example.action;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.apache.struts2.ServletActionContext;
-//
-//import com.example.model.Employee;
-//import com.example.model.Project;
-//import com.example.service.ProjectService;
-//
-//import com.opensymphony.xwork2.ActionSupport;
-//import com.opensymphony.xwork2.ActionContext;
-//
-//import java.io.File;
-//import java.io.FileInputStream;
-//import java.io.FileOutputStream;
-//
-//import java.io.InputStream;
-//import java.io.OutputStream;
-//import java.util.Map;
-//
-//public class AddProjectAction extends ActionSupport {
-//
-//    private Project project = new Project();
-//
-//    private File upload;
-//    private String uploadFileName;
-//    private String uploadContentType;
-//
-//    @Autowired
-//    private ProjectService projectService;
-//
-//    public Project getProject() { return project; }
-//    public void setProject(Project project) { this.project = project; }
-//
-//    public File getUpload() { return upload; }
-//    public void setUpload(File upload) { this.upload = upload; }
-//
-//    public String getUploadFileName() { return uploadFileName; }
-//    public void setUploadFileName(String uploadFileName) { this.uploadFileName = uploadFileName; }
-//
-//    public String getUploadContentType() { return uploadContentType; }
-//    public void setUploadContentType(String uploadContentType) { this.uploadContentType = uploadContentType; }
-//
-//    public String execute() throws Exception {
-//
-//        Map session = ActionContext.getContext().getSession();
-//        Employee emp = (Employee) session.get("loggedEmployee");
-//
-//        if (emp == null) {
-//            addActionError("Please login first.");
-//            return "login";
-//        }
-//
-//        if (project.getTitle() == null || "".equals(project.getTitle().trim())) {
-//            addActionError("Title required");
-//            return INPUT;
-//        }
-//
-//        if (upload != null) {
-//            String uploadDir = ServletActionContext.getServletContext().getRealPath("/uploads");
-//            File dir = new File(uploadDir);
-//            if (!dir.exists()) dir.mkdirs();
-//
-//            String uniqueName = System.currentTimeMillis() + "_" + uploadFileName;
-//            File dest = new File(dir, uniqueName);
-//
-//            InputStream in = new FileInputStream(upload);
-//            OutputStream out = new FileOutputStream(dest);
-//
-//            byte buffer[] = new byte[1024];
-//            int len = 0;
-//
-//            while ((len = in.read(buffer)) > 0) {
-//                out.write(buffer, 0, len);
-//            }
-//
-//            in.close();
-//            out.close();
-//
-//            project.setFilename(uploadFileName);
-//            project.setFilepath("uploads/" + uniqueName);
-//        }
-//
-//        project.setOwner(emp);
-//        projectService.save(project);
-//
-//        ServletActionContext.getRequest().setAttribute("project", project);
-//
-//        return SUCCESS;
-//    }
-//}
-
 package com.example.action;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.io.FileUtils;
 import org.apache.struts2.ServletActionContext;
+
 import com.example.model.Employee;
 import com.example.model.Project;
 import com.example.service.ProjectService;
+
 import com.opensymphony.xwork2.ActionSupport;
 import com.opensymphony.xwork2.ActionContext;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
 
 public class AddProjectAction extends ActionSupport {
 
-    private Project project = new Project();
-    private File upload;
-    private String uploadFileName;
-    private String uploadContentType;
+	private Project project = new Project();
+	private File upload;
+	private String uploadFileName;
+	private String uploadContentType;
 
-    @Autowired
-    private ProjectService projectService;
+	@Autowired
+	private ProjectService projectService;
 
-    public Project getProject() { return project; }
-    public void setProject(Project project) { this.project = project; }
+	public Project getProject() {
+		return project;
+	}
 
-    public File getUpload() { return upload; }
-    public void setUpload(File upload) { this.upload = upload; }
+	public void setProject(Project project) {
+		this.project = project;
+	}
 
-    public String getUploadFileName() { return uploadFileName; }
-    public void setUploadFileName(String uploadFileName) { this.uploadFileName = uploadFileName; }
+	public File getUpload() {
+		return upload;
+	}
 
-    public String getUploadContentType() { return uploadContentType; }
-    public void setUploadContentType(String uploadContentType) { this.uploadContentType = uploadContentType; }
+	public void setUpload(File upload) {
+		this.upload = upload;
+	}
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public String execute() throws Exception {
+	public String getUploadFileName() {
+		return uploadFileName;
+	}
 
-        Map session = ActionContext.getContext().getSession();
-        Employee emp = (Employee) session.get("loggedEmployee");
+	public void setUploadFileName(String uploadFileName) {
+		this.uploadFileName = uploadFileName;
+	}
 
-        if (emp == null) {
-            addActionError("Please login first.");
-            return "login";
-        }
+	public String getUploadContentType() {
+		return uploadContentType;
+	}
 
-        if (project.getTitle() == null || "".equals(project.getTitle().trim())) {
-            addActionError("Title required");
-            return INPUT;
-        }
+	public void setUploadContentType(String uploadContentType) {
+		this.uploadContentType = uploadContentType;
+	}
 
-        if (upload != null) {
-            String uploadDir = ServletActionContext.getServletContext().getRealPath("/uploads");
-            File dir = new File(uploadDir);
-            if (!dir.exists()) dir.mkdirs();
+	@Override
+	public String execute() throws Exception {
 
-            String uniqueName = System.currentTimeMillis() + "_" + uploadFileName;
-            File dest = new File(dir, uniqueName);
+		Map<String, Object> session = ActionContext.getContext().getSession();
+		Employee emp = (Employee) session.get("loggedEmployee");
 
-            InputStream in = new FileInputStream(upload);
-            OutputStream out = new FileOutputStream(dest);
-            byte buffer[] = new byte[1024];
-            int len = 0;
-            while ((len = in.read(buffer)) > 0) {
-                out.write(buffer, 0, len);
-            }
-            in.close();
-            out.close();
+		if (emp == null) {
+			addActionError("Please login first.");
+			return "login";
+		}
 
-            project.setFilename(uploadFileName);
-            project.setFilepath("uploads/" + uniqueName);
-        }
+		if (project.getTitle() == null || project.getTitle().trim().isEmpty()) {
+			addActionError("Title required");
+			return INPUT;
+		}
+		if (upload != null) {
 
-        // IMPORTANT: set owner so owner-based queries work
-        project.setOwner(emp);
-        projectService.save(project);
+			String basePath = ServletActionContext.getServletContext().getRealPath("/uploads"); // .getRealPath("/uploads/project_files");
 
-        // Pass to JSP
-        ServletActionContext.getRequest().setAttribute("project", project);
+			File folder = new File(basePath);
+			if (!folder.exists())
+				folder.mkdirs();
 
-        return SUCCESS;
-    }
+			String uniqueName = System.currentTimeMillis() + "_" + uploadFileName;
+
+			File dest = new File(folder, uniqueName);
+
+			FileUtils.copyFile(upload, dest);
+
+			project.setFilename(uploadFileName);
+			project.setFilepath("uploads/project_files/" + uniqueName);
+		}
+
+		project.setOwner(emp);
+
+		projectService.save(project);
+
+		return SUCCESS;
+	}
 }

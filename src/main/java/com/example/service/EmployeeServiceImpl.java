@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.dao.EmployeeDAO;
 import com.example.model.Employee;
@@ -11,60 +12,73 @@ import com.example.model.Employee;
 @Service("employeeService")
 public class EmployeeServiceImpl implements EmployeeService {
 
-    // DAO - will be injected either by XML (<property name="dao".../>) or by Spring
-    private EmployeeDAO dao;
+	// DAO - injected by Spring (XML or annotation)
+	private EmployeeDAO dao;
 
-    // setter required for XML property injection: <property name="dao" ref="employeeDAO"/>
-    public void setDao(EmployeeDAO dao) {
-        this.dao = dao;
-    }
+	public void setDao(EmployeeDAO dao) {
+		this.dao = dao;
+	}
 
-    @Transactional
-    public void save(Employee e) {
-        dao.save(e);
-    }
+	@Autowired(required = false)
+	public void autowireDao(EmployeeDAO dao) {
+		this.dao = dao;
+	}
 
-    @Transactional
-    public List<Employee> getAll() {
-        return dao.getAll();
-    }
+	@Transactional
+	public void save(Employee e) {
+		dao.save(e);
+	}
 
-    @Transactional
-    public Employee getById(int id) {
-        return dao.getById(id);
-    }
+	@Transactional
+	public List<Employee> getAll() {
+		return dao.getAll();
+	}
 
-    @Transactional
-    public void update(Employee e) {
-        dao.update(e);
-    }
+	@Transactional
+	public Employee getById(int id) {
+		return dao.getById(id);
+	}
 
-    @Transactional
-    public void delete(int id) {
-        dao.delete(id);
-    }
+	@Transactional
+	public void update(Employee e) {
+		dao.update(e);
+	}
 
-    @Transactional
-    public Employee findByUsername(String username) {
-        return dao.findByUsername(username);
-    }
+	@Transactional
+	public void delete(int id) {
+		dao.delete(id);
+	}
 
-    @Transactional
-    public boolean authenticate(String username, String password) {
-        Employee e = dao.findByUsername(username);
-        return e != null && e.getPassword().equals(password);
-    }
+	@Transactional
+	public Employee findByUsername(String username) {
+		return dao.findByUsername(username);
+	}
 
-    @Transactional
-    public boolean employeeExists(String username) {
-        return dao.employeeExists(username);
-    }
+	@Transactional
+	public boolean authenticate(String username, String password) {
+		Employee e = dao.findByUsername(username);
+		return e != null && e.getPassword().equals(password);
+	}
 
-    @Transactional
-    public Employee login(String username, String password) {
-        Employee emp = dao.findByUsername(username);
-        if (emp == null) return null;
-        if (emp.getPassword().equals(password)) return emp;
-        return null;
-    }
+	@Transactional
+	public boolean employeeExists(String username) {
+		return dao.employeeExists(username);
+	}
+
+	@Transactional
+	public Employee login(String username, String password) {
+		Employee emp = dao.findByUsername(username);
+		if (emp == null)
+			return null;
+		if (emp.getPassword().equals(password))
+			return emp;
+		return null;
+	}
+
+	@Transactional
+	@Override
+	public void updateStatus(int id, String status) {
+		dao.updateStatus(id, status);
+	}
+
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+          "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.example.model">
+
+    <class name="Employee" table="employee">
+        <id name="id" column="id">
+            <generator class="identity"/>
+        </id>
+
+        <property name="username" column="username" not-null="false"/>
+        <property name="password" column="password" not-null="false"/>
+
+        <property name="name" column="name"/>
+        <property name="email" column="email"/>
+        <property name="department" column="department"/>
+        <property name="address" column="address"/>
+        <property name="country" column="country"/>
+        <property name="father_name" column="father_name"/>
+        <property name="mother_name" column="mother_name"/>
+        <property name="expenses" column="expenses" type="double"/>
+        <property name="salary" column="salary" type="double"/>
+        <property name="role" column="role"/>
+        <property name="status" column="status" type="string"/>
+        
+        <!-- Owned projects: one-to-many (owner -> projects) -->
+        <set name="ownedProjects" inverse="true" lazy="true" cascade="all">
+            <key column="owner_id"/>
+            <one-to-many class="com.example.model.Project"/>
+        </set>
+
+        <!-- Shared projects: many-to-many via project_user_access (employee_id -> project_id) -->
+        <set name="sharedProjects" table="project_user_access" inverse="true" lazy="true" cascade="none">
+            <key column="employee_id"/>
+            <many-to-many class="com.example.model.Project" column="project_id"/>
+        </set>
+
+    </class>
+
+</hibernate-mapping>

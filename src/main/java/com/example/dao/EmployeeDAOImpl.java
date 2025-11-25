@@ -51,4 +51,14 @@ public class EmployeeDAOImpl implements EmployeeDAO {
     public boolean employeeExists(String username) {
         return findByUsername(username) != null;
     }
+    @Override
+    public void updateStatus(int id, String status) {
+        Session s = sessionFactory.getCurrentSession();
+        Employee e = (Employee) s.get(Employee.class, id);
+        if (e != null) {
+            e.setStatus(status);
+            s.update(e);
+        }
+    }
+
 }

@@ -14,4 +14,6 @@ public interface EmployeeService {
     boolean authenticate(String username, String password);
     boolean employeeExists(String username);
     Employee login(String username, String password);
+
+    void updateStatus(int id, String status);
 }
