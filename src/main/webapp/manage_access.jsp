@@ -1,39 +1,68 @@
-<%@ taglib prefix="s" uri="/struts-tags" %>
-<!DOCTYPE html>
+<%@ taglib prefix="s" uri="/struts-tags"%>
+<%
+com.example.model.Employee admin = (com.example.model.Employee) session.getAttribute("loggedEmployee");
+if (admin == null) {
+	response.sendRedirect("loginEmployee.jsp");
+	return;
+}
+%>
+
+<!doctype html>
 <html>
 <head>
-<title>Manage Access</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<title>Manage Access - <s:property value="projectTitle" /></title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
 </head>
+<body>
+	<div class="container mt-4">
+		<h3>
+			Manage Access for:
+			<s:property value="projectTitle" />
+		</h3>
 
-<body class="bg-light">
+		<form action="assignProjectAccess" method="post">
+			<input type="hidden" name="projectId"
+				value="<s:property value='projectId'/>" />
 
-<div class="container mt-4" style="max-width:800px;">
-  <div class="card p-4 shadow">
-    <h3>Manage Access: <s:property value="projectTitle"/></h3>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Assign</th>
+						<th>Name</th>
+						<th>Dept</th>
+						<th>Currently Assigned?</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<s:iterator value="allEmployees" var="emp">
+						<tr>
+							<td><input type="checkbox" name="userIds"
+								value="<s:property value='#emp.id'/>"
+								<s:if test="%{#allowedIds.contains(#emp.id)}"> checked="checked" </s:if> />
+							</td>
+							<td><s:property value="#emp.name" /></td>
+							<td><s:property value="#emp.department" /></td>
+							<td><s:if test="%{#allowedIds.contains(#emp.id)}">
+									<span class="badge bg-success">Assigned</span>
+								</s:if></td>
+							<td><s:if test="%{#allowedIds.contains(#emp.id)}">
+									<!-- remove link; will call execute with removeEmployeeId param -->
+									<a
+										href="assignProjectAccess?projectId=<s:property value='projectId'/>&removeEmployeeId=<s:property value='#emp.id'/>"
+										class="btn btn-sm btn-danger">Remove</a>
+								</s:if></td>
+						</tr>
+					</s:iterator>
+				</tbody>
+			</table>
 
-    <s:form action="assignProjectAccess" method="post" theme="simple">
-      <s:hidden name="projectId" value="%{projectId}"/>
-
-      <div class="border p-3" style="max-height:350px; overflow-y:auto;">
-        <s:iterator value="allEmployees" var="e">
-          <div class="form-check">
-            <input type="checkbox" class="form-check-input"
-                   name="userIds" value="<s:property value='#e.id'/>"
-                   <s:if test="%{allowedIds.contains(#e.id)}">checked="checked"</s:if>
-            />
-            <label class="form-check-label"><s:property value="#e.name"/></label>
-          </div>
-        </s:iterator>
-      </div>
-
-      <button class="btn btn-primary mt-3">Save Access</button>
-      <a href="viewProjects" class="btn btn-secondary mt-3">Cancel</a>
-
-    </s:form>
-
-  </div>
-</div>
-
+			<button type="submit" class="btn btn-primary">Save
+				Assignments</button>
+			<a href="viewProjects" class="btn btn-secondary">Back</a>
+		</form>
+	</div>
 </body>
 </html>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+          "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="com.example.model">
+
+    <class name="Project" table="project">
+        <id name="id" column="id">
+            <generator class="identity"/>
+        </id>
+
+        <property name="title" column="title"/>
+        <property name="description" column="description" type="text"/>
+        <property name="filename" column="filename"/>
+        <property name="filepath" column="filepath"/>
+        <property name="createdAt" column="createdat" type="timestamp"/>
+
+        <!-- Owner (many-to-one) -->
+        <many-to-one name="owner" class="com.example.model.Employee" column="owner_id" lazy="proxy" not-null="false" />
+
+        <!-- allowedUsers many-to-many via project_user_access -->
+        <set name="allowedUsers" table="project_user_access" lazy="false" cascade="none">
+            <key column="project_id"/>
+            <many-to-many class="com.example.model.Employee" column="employee_id"/>
+        </set>
+
+    </class>
+
+</hibernate-mapping>

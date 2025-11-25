@@ -1,94 +1,101 @@
 package com.example.service;
 
+import com.example.dao.ProjectDAO;
+import com.example.model.Project;
+import com.example.model.Employee;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.transaction.annotation.Transactional;
-
-import com.example.dao.ProjectDAO;
-import com.example.dao.EmployeeDAO;
-import com.example.model.Employee;
-import com.example.model.Project;
-
 public class ProjectServiceImpl implements ProjectService {
 
-    private ProjectDAO dao;
-    private EmployeeDAO employeeDAO;
+	private ProjectDAO dao;
 
-    public void setDao(ProjectDAO dao) { this.dao = dao; }
-    public void setEmployeeDAO(EmployeeDAO employeeDAO) { this.employeeDAO = employeeDAO; }
+	public void setDao(ProjectDAO dao) {
+		this.dao = dao;
+	}
 
-    @Transactional
-    public void save(Project p) {
-        dao.save(p);
-    }
+	@Override
+	public void save(Project p) {
+		dao.save(p);
+	}
 
-    @Transactional
-    public Project findById(int id) {
-        return dao.getById(id);
-    }
+	@Override
+	public List<Project> getAllProjects() {
+		return dao.findAll();
+	}
 
-    @Transactional
-    public List<Project> getAllProjects() {
-        return dao.findAll();
-    }
+	@Override
+	public List<Project> findByOwnerId(int ownerId) {
+		return dao.findByOwnerId(ownerId);
+	}
 
-    // MAIN ACCESS METHOD
-    @Transactional
-    public List<Project> getAccessibleProjects(Employee emp) {
+	@Override
+	public Project getById(int id) {
+		return dao.getById(id);
+	}
 
-        if (emp == null) return new ArrayList<Project>();
+	@Override
+	public void delete(int id) {
+		dao.delete(id);
+	}
 
-        // ADMIN sees ALL
-        if ("ADMIN".equalsIgnoreCase(emp.getRole())) {
-            return dao.findAll();
-        }
+	@Override
+	public List<Project> getAccessibleProjects(Employee emp) {
 
-        // USER → owned + shared
-        List<Project> owned = dao.findByOwnerId(emp.getId());
-        List<Project> shared = dao.findSharedWithUser(emp.getId());
+		if (emp == null)
+			return new ArrayList<>();
 
-        Set<Project> set = new HashSet<Project>();
-        if (owned != null) set.addAll(owned);
-        if (shared != null) set.addAll(shared);
+		// Admin → all projects
+		if ("ADMIN".equalsIgnoreCase(emp.getRole())) {
+			return dao.findAll();
+		}
 
-        return new ArrayList<Project>(set);
-    }
+		List<Project> result = new ArrayList<>();
 
-    @Transactional
-    public void removeAssignment(int projectId, int employeeId) {
-        dao.removeAssignment(projectId, employeeId);
-    }
+		// EMPLOYEE OWNED PROJECTS
+		List<Project> owned = dao.findByOwnerId(emp.getId());
+		if (owned != null)
+			result.addAll(owned);
 
-    @Transactional
-    public List<Project> findAll() {
-        return dao.findAll();
-    }
+		List<Project> shared = dao.findSharedWithUser(emp.getId());
+		if (shared != null)
+			result.addAll(shared);
 
-    @Transactional
-    public List<Project> findByOwnerId(int ownerId) {
-        return dao.findByOwnerId(ownerId);
-    }
+		// remove duplicates if any
+		return new ArrayList<>(new HashSet<>(result));
+	}
 
-    @Transactional
-    public Project getById(int id) {
-        return dao.getById(id);
-    }
+	@Override
+	public List<Project> getProjectsOwnedBy(int employeeId) {
+		return dao.findByOwnerId(employeeId);
+	}
 
-    @Transactional
-    public void delete(int id) {
-        dao.delete(id);
-    }
+	@Override
+	public List<Project> getProjectsSharedWith(int employeeId) {
+		return dao.findSharedWithUser(employeeId);
+	}
 
-    @Transactional
-    public List<Integer> getAssignedEmployeeIds(int projectId) {
-        return dao.findAssignedEmployeeIds(projectId);
-    }
+	@Override
+	public List<Integer> getAssignedEmployeeIds(int projectId) {
+		return dao.findAssignedEmployeeIds(projectId);
+	}
 
-    @Transactional
-    public void assignUsersToProject(int projectId, List<Integer> employeeIds) {
-        dao.replaceAssignedEmployeeIds(projectId, employeeIds);
-    }
+	@Override
+	public void replaceAssignedEmployeeIds(int projectId, List<Integer> employeeIds) {
+		dao.replaceAssignedEmployeeIds(projectId, employeeIds);
+	}
+
+	@Override
+	public void assignUsersToProject(int projectId, List<Integer> employeeIds) {
+		// semantic alias
+		replaceAssignedEmployeeIds(projectId, employeeIds);
+	}
+
+	@Override
+	public void removeAssignment(int projectId, int employeeId) {
+		dao.removeAssignment(projectId, employeeId);
+	}
 }
