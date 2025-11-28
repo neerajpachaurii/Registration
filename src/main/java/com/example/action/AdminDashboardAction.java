@@ -1,3 +1,228 @@
+//package com.example.action;
+//
+//import java.io.ByteArrayInputStream;
+//import java.io.InputStream;
+//import java.util.ArrayList;
+//import java.util.List;
+//
+//import org.apache.struts2.ServletActionContext;
+//
+//import com.example.model.Employee;
+//import com.example.model.Project;
+//import com.example.service.EmployeeService;
+//import com.example.service.ProjectService;
+//import com.opensymphony.xwork2.ActionSupport;
+//
+//public class AdminDashboardAction extends ActionSupport {
+//
+//	private EmployeeService employeeService;
+//	private ProjectService projectService;
+//
+//	public void setEmployeeService(EmployeeService s) {
+//		this.employeeService = s;
+//	}
+//
+//	public void setProjectService(ProjectService s) {
+//		this.projectService = s;
+//	}
+//
+//	// OUTPUT LISTS
+//	private List<Employee> employees;
+//	private List<Project> projects;
+//
+//	// SEARCH INPUTS
+//	private String searchTitle;
+//	private String searchOwner;
+//	private String searchDept;
+//	private String searchEmail;
+//
+//	// PAGINATION
+//	private int page = 1;
+//	private int pageSize = 5;
+//	private int totalPages;
+//
+//	// Stream for Excel export (Struts stream result will use this)
+//	private InputStream inputStream;
+//
+//	public InputStream getInputStream() {
+//		return inputStream;
+//	}
+//
+//	public List<Employee> getEmployees() {
+//		return employees;
+//	}
+//
+//	public List<Project> getProjects() {
+//		return projects;
+//	}
+//
+//	public void setSearchTitle(String s) {
+//		this.searchTitle = s;
+//	}
+//
+//	public void setSearchOwner(String s) {
+//		this.searchOwner = s;
+//	}
+//
+//	public void setSearchDept(String s) {
+//		this.searchDept = s;
+//	}
+//
+//	public void setSearchEmail(String s) {
+//		this.searchEmail = s;
+//	}
+//
+//	public void setPage(int page) {
+//		this.page = page;
+//	}
+//
+//	public int getPage() {
+//		return page;
+//	}
+//
+//	public int getTotalPages() {
+//		return totalPages;
+//	}
+//
+//	@Override
+//	public String execute() throws Exception {
+//
+//		Employee admin = (Employee) ServletActionContext.getRequest().getSession().getAttribute("loggedEmployee");
+//
+//		if (admin == null || !"ADMIN".equals(admin.getRole())) {
+//			return "login";
+//		}
+//
+//		// LOAD ALL
+//		List<Project> allProjects = projectService.getAllProjects();
+//		List<Employee> allEmployees = employeeService.getAll();
+//
+//		if (allProjects == null)
+//			allProjects = new ArrayList<Project>();
+//		if (allEmployees == null)
+//			allEmployees = new ArrayList<Employee>();
+//
+//		// FILTER PROJECTS
+//		List<Project> filteredProjects = new ArrayList<Project>();
+//		for (Project p : allProjects) {
+//			boolean match = true;
+//
+//			if (searchTitle != null && !"".equals(searchTitle.trim())) {
+//				if (p.getTitle() == null || !p.getTitle().toLowerCase().contains(searchTitle.toLowerCase())) {
+//					match = false;
+//				}
+//			}
+//
+//			if (searchOwner != null && !"".equals(searchOwner.trim())) {
+//				String owner = (p.getOwner() != null) ? p.getOwner().getName() : "";
+//				if (owner == null || !owner.toLowerCase().contains(searchOwner.toLowerCase())) {
+//					match = false;
+//				}
+//			}
+//
+//			if (match) {
+//				filteredProjects.add(p);
+//			}
+//		}
+//
+//		// FILTER EMPLOYEES
+//		List<Employee> filteredEmployees = new ArrayList<Employee>();
+//		for (Employee e : allEmployees) {
+//			boolean match = true;
+//
+//			if (searchDept != null && !"".equals(searchDept.trim())) {
+//				if (e.getDepartment() == null || !e.getDepartment().toLowerCase().contains(searchDept.toLowerCase())) {
+//					match = false;
+//				}
+//			}
+//
+//			if (searchEmail != null && !"".equals(searchEmail.trim())) {
+//				if (e.getEmail() == null || !e.getEmail().toLowerCase().contains(searchEmail.toLowerCase())) {
+//					match = false;
+//				}
+//			}
+//
+//			if (match) {
+//				filteredEmployees.add(e);
+//			}
+//		}
+//
+//		// PAGINATION
+//		int total = filteredProjects.size();
+//		totalPages = (total + pageSize - 1) / pageSize;
+//		if (totalPages == 0)
+//			totalPages = 1;
+//		if (page < 1)
+//			page = 1;
+//		if (page > totalPages)
+//			page = totalPages;
+//
+//		int start = (page - 1) * pageSize;
+//		int end = Math.min(start + pageSize, total);
+//
+//		// handle case when filteredProjects is empty or start==end
+//		if (start >= 0 && end >= start && !filteredProjects.isEmpty()) {
+//			projects = filteredProjects.subList(start, end);
+//		} else {
+//			projects = new ArrayList<Project>();
+//		}
+//
+//		employees = filteredEmployees;
+//
+//		return SUCCESS;
+//	}
+//
+//	public String exportToExcel() {
+//		try {
+//			// Session check
+//			Employee admin = (Employee) ServletActionContext.getRequest().getSession().getAttribute("loggedEmployee");
+//
+//			if (admin == null || !"ADMIN".equals(admin.getRole())) {
+//				addActionError("Access Denied");
+//				return ERROR;
+//			}
+//
+//			// Load all employees from service
+//			employees = employeeService.getAll();
+//
+//			if (employees == null || employees.isEmpty()) {
+//				addActionError("No Employee Data Found to Export");
+//				return ERROR;
+//			}
+//
+//			StringBuilder sb = new StringBuilder();
+//
+//			// Header
+//			sb.append("ID\tName\tEmail\tDepartment\tSalary\tStatus\tRole\n");
+//
+//			for (Employee e : employees) {
+//				sb.append(nullSafeString(e.getId())).append("\t").append(nullSafeString(e.getName())).append("\t")
+//						.append(nullSafeString(e.getEmail())).append("\t").append(nullSafeString(e.getDepartment()))
+//						.append("\t").append(nullSafeString(e.getSalary())).append("\t")
+//						.append(nullSafeString(e.getStatus())).append("\t").append(nullSafeString(e.getRole()))
+//						.append("\n");
+//			}
+//
+//			byte[] bytes = sb.toString().getBytes("UTF-8");
+//			inputStream = new ByteArrayInputStream(bytes);
+//
+//			// Struts stream result will use getInputStream()
+//			return "excel";
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			addActionError("Error exporting data: " + e.getMessage());
+//			return ERROR;
+//		}
+//	}
+//	
+//	
+//
+//	// helper: avoid NPE while appending
+//	private String nullSafeString(Object o) {
+//		return (o == null) ? "" : o.toString();
+//	}
+//}
 package com.example.action;
 
 import java.io.ByteArrayInputStream;
@@ -15,209 +240,240 @@ import com.opensymphony.xwork2.ActionSupport;
 
 public class AdminDashboardAction extends ActionSupport {
 
-	private EmployeeService employeeService;
-	private ProjectService projectService;
+    private EmployeeService employeeService;
+    private ProjectService projectService;
 
-	public void setEmployeeService(EmployeeService s) {
-		this.employeeService = s;
-	}
+    public void setEmployeeService(EmployeeService s) {
+        this.employeeService = s;
+    }
 
-	public void setProjectService(ProjectService s) {
-		this.projectService = s;
-	}
+    public void setProjectService(ProjectService s) {
+        this.projectService = s;
+    }
 
-	// OUTPUT LISTS
-	private List<Employee> employees;
-	private List<Project> projects;
+    private List<Employee> employees;
+    private List<Project> projects;
 
-	// SEARCH INPUTS
-	private String searchTitle;
-	private String searchOwner;
-	private String searchDept;
-	private String searchEmail;
+    // SEARCH
+    private String searchTitle;
+    private String searchOwner;
+    private String searchDept;
+    private String searchEmail;
 
-	// PAGINATION
-	private int page = 1;
-	private int pageSize = 5;
-	private int totalPages;
+    // PAGINATION
+    private int page = 1;
+    private int pageSize = 5;
+    private int totalPages;
 
-	// Stream for Excel export (Struts stream result will use this)
-	private InputStream inputStream;
+    // Excel stream
+    private InputStream inputStream;
 
-	public InputStream getInputStream() {
-		return inputStream;
-	}
+    public InputStream getInputStream() {
+        return inputStream;
+    }
 
-	public List<Employee> getEmployees() {
-		return employees;
-	}
+    public List<Employee> getEmployees() {
+        return employees;
+    }
 
-	public List<Project> getProjects() {
-		return projects;
-	}
+    public List<Project> getProjects() {
+        return projects;
+    }
 
-	public void setSearchTitle(String s) {
-		this.searchTitle = s;
-	}
+    public void setSearchTitle(String s) { this.searchTitle = s; }
+    public void setSearchOwner(String s) { this.searchOwner = s; }
+    public void setSearchDept(String s) { this.searchDept = s; }
+    public void setSearchEmail(String s) { this.searchEmail = s; }
 
-	public void setSearchOwner(String s) {
-		this.searchOwner = s;
-	}
+    public void setPage(int page) { this.page = page; }
+    public int getPage() { return page; }
+    public int getTotalPages() { return totalPages; }
 
-	public void setSearchDept(String s) {
-		this.searchDept = s;
-	}
+    @Override
+    public String execute() throws Exception {
 
-	public void setSearchEmail(String s) {
-		this.searchEmail = s;
-	}
+        Employee admin = (Employee) ServletActionContext.getRequest().getSession()
+                .getAttribute("loggedEmployee");
 
-	public void setPage(int page) {
-		this.page = page;
-	}
+        if (admin == null || !"ADMIN".equals(admin.getRole())) {
+            return "login";
+        }
 
-	public int getPage() {
-		return page;
-	}
+        List<Project> allProjects = projectService.getAllProjects();
+        List<Employee> allEmployees = employeeService.getAll();
 
-	public int getTotalPages() {
-		return totalPages;
-	}
+        if (allProjects == null) allProjects = new ArrayList<Project>();
+        if (allEmployees == null) allEmployees = new ArrayList<Employee>();
 
-	@Override
-	public String execute() throws Exception {
+        // FILTER PROJECTS
+        List<Project> filteredProjects = new ArrayList<Project>();
+        for (Project p : allProjects) {
+            boolean match = true;
 
-		Employee admin = (Employee) ServletActionContext.getRequest().getSession().getAttribute("loggedEmployee");
+            if (searchTitle != null && !"".equals(searchTitle.trim())) {
+                if (p.getTitle() == null ||
+                        !p.getTitle().toLowerCase().contains(searchTitle.toLowerCase())) {
+                    match = false;
+                }
+            }
 
-		if (admin == null || !"ADMIN".equals(admin.getRole())) {
-			return "login";
-		}
+            if (searchOwner != null && !"".equals(searchOwner.trim())) {
+                String owner = (p.getOwner() != null) ? p.getOwner().getName() : "";
+                if (owner == null ||
+                        !owner.toLowerCase().contains(searchOwner.toLowerCase())) {
+                    match = false;
+                }
+            }
 
-		// LOAD ALL
-		List<Project> allProjects = projectService.getAllProjects();
-		List<Employee> allEmployees = employeeService.getAll();
+            if (match) filteredProjects.add(p);
+        }
 
-		if (allProjects == null)
-			allProjects = new ArrayList<Project>();
-		if (allEmployees == null)
-			allEmployees = new ArrayList<Employee>();
+        // FILTER EMPLOYEES
+        List<Employee> filteredEmployees = new ArrayList<Employee>();
+        for (Employee e : allEmployees) {
+            boolean match = true;
 
-		// FILTER PROJECTS
-		List<Project> filteredProjects = new ArrayList<Project>();
-		for (Project p : allProjects) {
-			boolean match = true;
+            if (searchDept != null && !"".equals(searchDept.trim())) {
+                if (e.getDepartment() == null ||
+                        !e.getDepartment().toLowerCase().contains(searchDept.toLowerCase())) {
+                    match = false;
+                }
+            }
 
-			if (searchTitle != null && !"".equals(searchTitle.trim())) {
-				if (p.getTitle() == null || !p.getTitle().toLowerCase().contains(searchTitle.toLowerCase())) {
-					match = false;
-				}
-			}
+            if (searchEmail != null && !"".equals(searchEmail.trim())) {
+                if (e.getEmail() == null ||
+                        !e.getEmail().toLowerCase().contains(searchEmail.toLowerCase())) {
+                    match = false;
+                }
+            }
 
-			if (searchOwner != null && !"".equals(searchOwner.trim())) {
-				String owner = (p.getOwner() != null) ? p.getOwner().getName() : "";
-				if (owner == null || !owner.toLowerCase().contains(searchOwner.toLowerCase())) {
-					match = false;
-				}
-			}
+            if (match) filteredEmployees.add(e);
+        }
 
-			if (match) {
-				filteredProjects.add(p);
-			}
-		}
+        // PAGINATION
+        int total = filteredProjects.size();
+        totalPages = (total + pageSize - 1) / pageSize;
 
-		// FILTER EMPLOYEES
-		List<Employee> filteredEmployees = new ArrayList<Employee>();
-		for (Employee e : allEmployees) {
-			boolean match = true;
+        if (totalPages == 0) totalPages = 1;
+        if (page < 1) page = 1;
+        if (page > totalPages) page = totalPages;
 
-			if (searchDept != null && !"".equals(searchDept.trim())) {
-				if (e.getDepartment() == null || !e.getDepartment().toLowerCase().contains(searchDept.toLowerCase())) {
-					match = false;
-				}
-			}
+        int start = (page - 1) * pageSize;
+        int end = Math.min(start + pageSize, total);
 
-			if (searchEmail != null && !"".equals(searchEmail.trim())) {
-				if (e.getEmail() == null || !e.getEmail().toLowerCase().contains(searchEmail.toLowerCase())) {
-					match = false;
-				}
-			}
+        if (start >= 0 && end >= start && !filteredProjects.isEmpty()) {
+            projects = filteredProjects.subList(start, end);
+        } else {
+            projects = new ArrayList<Project>();
+        }
 
-			if (match) {
-				filteredEmployees.add(e);
-			}
-		}
+        employees = filteredEmployees;
 
-		// PAGINATION
-		int total = filteredProjects.size();
-		totalPages = (total + pageSize - 1) / pageSize;
-		if (totalPages == 0)
-			totalPages = 1;
-		if (page < 1)
-			page = 1;
-		if (page > totalPages)
-			page = totalPages;
+        return SUCCESS;
+    }
 
-		int start = (page - 1) * pageSize;
-		int end = Math.min(start + pageSize, total);
+    // EMPLOYEES EXCEL EXPORT
+    public String exportToExcel() {
+        try {
+            Employee admin = (Employee) ServletActionContext.getRequest().getSession()
+                    .getAttribute("loggedEmployee");
 
-		// handle case when filteredProjects is empty or start==end
-		if (start >= 0 && end >= start && !filteredProjects.isEmpty()) {
-			projects = filteredProjects.subList(start, end);
-		} else {
-			projects = new ArrayList<Project>();
-		}
+            if (admin == null || !"ADMIN".equals(admin.getRole())) {
+                addActionError("Access Denied");
+                return ERROR;
+            }
 
-		employees = filteredEmployees;
+            employees = employeeService.getAll();
 
-		return SUCCESS;
-	}
+            if (employees == null || employees.isEmpty()) {
+                addActionError("No Employee Data Found to Export");
+                return ERROR;
+            }
 
-	public String exportToExcel() {
-		try {
-			// Session check
-			Employee admin = (Employee) ServletActionContext.getRequest().getSession().getAttribute("loggedEmployee");
+            StringBuilder sb = new StringBuilder();
+            sb.append("ID\tName\tEmail\tDepartment\tSalary\tStatus\tRole\n");
 
-			if (admin == null || !"ADMIN".equals(admin.getRole())) {
-				addActionError("Access Denied");
-				return ERROR;
-			}
+            for (Employee e : employees) {
+                sb.append(nullSafeString(e.getId())).append("\t")
+                        .append(nullSafeString(e.getName())).append("\t")
+                        .append(nullSafeString(e.getEmail())).append("\t")
+                        .append(nullSafeString(e.getDepartment())).append("\t")
+                        .append(nullSafeString(e.getSalary())).append("\t")
+                        .append(nullSafeString(e.getStatus())).append("\t")
+                        .append(nullSafeString(e.getRole())).append("\n");
+            }
 
-			// Load all employees from service
-			employees = employeeService.getAll();
+            inputStream = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+            return "excel";
 
-			if (employees == null || employees.isEmpty()) {
-				addActionError("No Employee Data Found to Export");
-				return ERROR;
-			}
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ERROR;
+        }
+    }
 
-			StringBuilder sb = new StringBuilder();
+    // PROJECTS EXCEL EXPORT
+    public String exportProjectsToExcel() {
+        try {
+            Employee admin = (Employee) ServletActionContext.getRequest().getSession()
+                    .getAttribute("loggedEmployee");
 
-			// Header
-			sb.append("ID\tName\tEmail\tDepartment\tSalary\tStatus\tRole\n");
+            if (admin == null || !"ADMIN".equals(admin.getRole())) {
+                addActionError("Access Denied");
+                return ERROR;
+            }
 
-			for (Employee e : employees) {
-				sb.append(nullSafeString(e.getId())).append("\t").append(nullSafeString(e.getName())).append("\t")
-						.append(nullSafeString(e.getEmail())).append("\t").append(nullSafeString(e.getDepartment()))
-						.append("\t").append(nullSafeString(e.getSalary())).append("\t")
-						.append(nullSafeString(e.getStatus())).append("\t").append(nullSafeString(e.getRole()))
-						.append("\n");
-			}
+            List<Project> all = projectService.getAllProjects();
 
-			byte[] bytes = sb.toString().getBytes("UTF-8");
-			inputStream = new ByteArrayInputStream(bytes);
+            if (all == null || all.isEmpty()) {
+                addActionError("No Project Data Found to Export");
+                return ERROR;
+            }
 
-			// Struts stream result will use getInputStream()
-			return "excel";
+            StringBuilder sb = new StringBuilder();
+            sb.append("ID\tTitle\tDescription\tOwner\tAssigned Users\n");
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			addActionError("Error exporting data: " + e.getMessage());
-			return ERROR;
-		}
-	}
+            for (Project p : all) {
 
-	// helper: avoid NPE while appending
-	private String nullSafeString(Object o) {
-		return (o == null) ? "" : o.toString();
-	}
+                String owner = "";
+                if (p.getOwner() != null) owner = p.getOwner().getName();
+
+                String allowed = "";
+                if (p.getAllowedUsers() != null) {
+                    List<String> names = new ArrayList<String>();
+                    for (Employee u : p.getAllowedUsers()) {
+                        names.add(u.getName());
+                    }
+                    allowed = join(names, ",");
+                }
+
+                sb.append(p.getId()).append("\t")
+                        .append(nullSafeString(p.getTitle())).append("\t")
+                        .append(nullSafeString(p.getDescription())).append("\t")
+                        .append(owner).append("\t")
+                        .append(allowed).append("\n");
+            }
+
+            inputStream = new ByteArrayInputStream(sb.toString().getBytes("UTF-8"));
+            return "excelProjects";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ERROR;
+        }
+    }
+
+    // Helper method (Java 7 compatible)
+    private String join(List<String> list, String sep) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(list.get(i));
+            if (i < list.size() - 1) sb.append(sep);
+        }
+        return sb.toString();
+    }
+
+    private String nullSafeString(Object o) {
+        return (o == null) ? "" : o.toString();
+    }
 }

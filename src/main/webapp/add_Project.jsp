@@ -42,7 +42,7 @@
 
 				<button class="btn btn-primary w-100">Save Project</button>
 				<div class="text-center mt-3">
-					<a href="admin_home.jsp" class="btn btn-secondary w-100">Back</a>
+					<a href="adminDashboard" class="btn btn-secondary w-100">Back</a>
 				</div>
 			</s:form>
 		</div>
