@@ -4,144 +4,155 @@
 
 <struts>
 
-	<!-- Allow Spring to manage Struts actions -->
-	<constant name="struts.objectFactory" value="spring" />
-	<constant name="struts.devMode" value="false" />
+    <constant name="struts.objectFactory" value="spring" />
+    <constant name="struts.devMode" value="false" />
 
-	<package name="default" namespace="/" extends="struts-default">
+    <!-- ===========================
+         MAIN APPLICATION PACKAGE
+         =========================== -->
+    <package name="app" namespace="/" extends="struts-default">
 
-		<action name="loginEmployee"
-			class="com.example.action.LoginEmployeeAction">
-			<result name="success">employee_welcome.jsp</result>
-			<result name="adminHome">admin_home.jsp</result>
-			<result name="employeeHome">employee_home.jsp</result>
-			<result name="input">loginEmployee.jsp</result>
-			<result name="register_first">addEmployee.jsp</result>
-		</action>
+        <action name="loginEmployee" class="com.example.action.LoginEmployeeAction">
+            <result name="success">employee_welcome.jsp</result>
+            <result name="adminHome">admin_home.jsp</result>
+            <result name="employeeHome">employee_home.jsp</result>
+            <result name="input">loginEmployee.jsp</result>
+            <result name="register_first">addEmployee.jsp</result>
+        </action>
 
-		<action name="logoutEmployee"
-			class="com.example.action.LogoutEmployeeAction">
-			<result name="success">/index.jsp</result>
-		</action>
+        <action name="logoutEmployee" class="com.example.action.LogoutEmployeeAction">
+            <result name="success">/index1.jsp</result>
+         <!--    <result name="success">/index.jsp</result> -->
+        </action>
 
-		<action name="addEmployee"
-			class="com.example.action.AddEmployeeAction">
-			<result name="success">employee_success.jsp</result>
-			<result name="input">addEmployee.jsp</result>
-		</action>
+        <action name="addEmployee" class="com.example.action.AddEmployeeAction">
+            <result name="success">employee_success.jsp</result>
+            <result name="input">addEmployee.jsp</result>
+        </action>
 
-		<action name="viewEmployees"
-			class="com.example.action.ViewEmployeeAction">
-			<result name="success">viewEmployee.jsp</result>
-			<result name="login">loginEmployee.jsp</result>
-		</action>
+        <action name="viewEmployees" class="com.example.action.ViewEmployeeAction">
+            <result name="success">viewEmployee.jsp</result>
+            <result name="login">loginEmployee.jsp</result>
+        </action>
 
-		<action name="editEmployee"
-			class="com.example.action.EditEmployeeAction">
-			<result name="success">editEmployee.jsp</result>
-			<result name="input">editEmployee.jsp</result>
-			<result name="accessDenied">error.jsp</result>
-			<result name="login">loginEmployee.jsp</result>
-		</action>
+        <action name="editEmployee" class="com.example.action.EditEmployeeAction">
+            <result name="success">editEmployee.jsp</result>
+            <result name="input">editEmployee.jsp</result>
+            <result name="accessDenied">error.jsp</result>
+            <result name="login">loginEmployee.jsp</result>
+        </action>
 
-		<action name="updateEmployee"
-			class="com.example.action.UpdateEmployeeAction">
-			<result name="success" type="redirect">viewEmployees</result>
-		</action>
+        <action name="updateEmployee" class="com.example.action.UpdateEmployeeAction">
+            <result name="success" type="redirect">viewEmployees</result>
+        </action>
 
-		<action name="deleteEmployee"
-			class="com.example.action.DeleteEmployeeAction">
-			<result name="success" type="redirect">viewEmployees</result>
-		</action>
+        <action name="deleteEmployee" class="com.example.action.DeleteEmployeeAction">
+            <result name="success" type="redirect">viewEmployees</result>
+        </action>
 
-		<action name="addProject"
-			class="com.example.action.AddProjectAction">
-			<result name="success">project_success.jsp</result>
-			<result name="input">add_Project.jsp</result>
-		</action>
+        <action name="addProject" class="com.example.action.AddProjectAction">
+            <result name="success">project_success.jsp</result>
+            <result name="input">add_Project.jsp</result>
+        </action>
 
-		<action name="adminDashboard"
-			class="com.example.action.AdminDashboardAction">
-			<result name="success">admin_home.jsp</result>
-			<result name="login">loginEmployee.jsp</result>
-			<result name="accessDenied">error.jsp</result>
-		</action>
-		<action name="employeeDashboard"
-			class="com.example.action.EmployeeDashboardAction">
-			<result name="success">employee_home.jsp</result>
-			<result name="login">loginEmployee.jsp</result>
-		</action>
+        <action name="adminDashboard" class="com.example.action.AdminDashboardAction">
+            <result name="success">admin_home.jsp</result>
+            <result name="login">loginEmployee.jsp</result>
+            <result name="accessDenied">error.jsp</result>
+        </action>
 
+        <action name="employeeDashboard" class="com.example.action.EmployeeDashboardAction">
+            <result name="success">employee_home.jsp</result>
+            <result name="login">loginEmployee.jsp</result>
+        </action>
 
+        <action name="viewProjects" class="com.example.action.ViewProjectsAction">
+            <result name="success">view_projects.jsp</result>
+            <result name="login">loginEmployee.jsp</result>
+        </action>
 
+        <action name="assignProjectAccessPage"
+                class="com.example.action.AssignProjectAccessAction" method="input">
+            <result name="input">manage_access.jsp</result>
+            <result name="accessDenied">error.jsp</result>
+        </action>
 
-		<action name="viewProjects"
-			class="com.example.action.ViewProjectsAction">
-			<!-- <result name="success">employee_home.jsp</result> -->
-			<result name="success">view_projects.jsp</result>
+        <action name="assignProjectAccess" class="com.example.action.AssignProjectAction">
+            <result name="success" type="redirect">viewProjects</result>
+        </action>
 
-			<result name="login">loginEmployee.jsp</result>
-		</action>
+        <action name="updateEmployeeStatus"
+                class="com.example.action.UpdateEmployeeStatusAction">
+            <result name="success" type="redirectAction">
+                <param name="actionName">adminDashboard</param>
+            </result>
+            <result name="accessDenied">error.jsp</result>
+        </action>
 
-		<action name="assignProjectAccessPage"
-			class="com.example.action.AssignProjectAccessAction" method="input">
-			<result name="input">manage_access.jsp</result>
-			<result name="accessDenied">error.jsp</result>
-		</action>
+        <action name="deleteProject" class="com.example.action.DeleteProjectAction">
+            <result name="success" type="redirect">viewProjects</result>
+        </action>
 
+        <action name="downloadProjectFile"
+                class="com.example.action.DownloadProjectFileAction">
+            <result name="success" type="stream">
+                <param name="contentType">application/octet-stream</param>
+                <param name="inputName">fileInputStream</param>
+                <param name="contentDisposition">
+                    attachment;filename="${downloadFileName}"
+                </param>
+                <param name="bufferSize">1024</param>
+            </result>
+        </action>
 
-		<action name="assignProjectAccess"
-			class="com.example.action.AssignProjectAction" method="execute">
-			<result name="success" type="redirect">viewProjects</result>
-			<result name="input">manage_access.jsp</result>
-			<result name="error">error.jsp</result>
-			<result name="accessDenied">error.jsp</result>
-		</action>
+        <action name="exportEmployees"
+                class="com.example.action.AdminDashboardAction"
+                method="exportToExcel">
+            <result name="excel" type="stream">
+                <param name="contentType">application/vnd.ms-excel</param>
+                <param name="contentDisposition">
+                    attachment;filename=employees_data.xls
+                </param>
+                <param name="inputName">inputStream</param>
+            </result>
+        </action>
+        
+        <action name="exportProjects"
+        class="com.example.action.AdminDashboardAction"
+        method="exportProjectsToExcel">
+    <result name="excelProjects" type="stream">
+        <param name="contentType">application/vnd.ms-excel</param>
+        <param name="contentDisposition">
+            attachment;filename=projects_data.xls
+        </param>
+        <param name="inputName">inputStream</param>
+    </result>
+</action>
+        
 
-		<action name="updateEmployeeStatus"
-			class="com.example.action.UpdateEmployeeStatusAction">
-
-			<result name="success" type="redirectAction">
-				<param name="actionName">adminDashboard</param>
-			</result>
-
-			<result name="accessDenied">/error.jsp</result>
-			<result name="error">/error.jsp</result>
-		</action>
-		<action name="deleteProject"
-			class="com.example.action.DeleteProjectAction">
-			<result name="success" type="redirect">viewProjects</result>
-		</action>
-
-		<action name="downloadProjectFile"
-			class="com.example.action.DownloadProjectFileAction">
-			<result name="success" type="stream">
-				<param name="contentType">application/octet-stream</param>
-				<param name="inputName">fileInputStream</param>
-				<param name="contentDisposition">
-					attachment;filename="${downloadFileName}"
-				</param>
-				<param name="bufferSize">1024</param>
-			</result>
-
-			<result name="error">/error.jsp</result>
-		</action>
-
-		<action name="exportEmployees"
-			class="com.example.action.AdminDashboardAction"
-			method="exportToExcel">
-
-			<result name="excel" type="stream">
-				<param name="contentType">application/vnd.ms-excel</param>
-				<param name="contentDisposition"> attachment;filename=employees_data.xls </param>
-				<param name="inputName">inputStream</param>
-				<param name="bufferSize">1024</param>
-			</result>
-
-			<result name="error">/error.jsp</result>
-		</action>
+    </package>  <!-- END OF MAIN PACKAGE -->
 
 
-	</package>
+
+    <!-- ===========================
+         JSON API PACKAGE
+         =========================== -->
+    <package name="api-json" namespace="/" extends="json-default">
+
+        <action name="getProjectsJson" class="com.example.action.GetProjectsJsonAction">
+            <result type="json">
+                <param name="root">result</param>
+                <param name="excludeNullProperties">true</param>
+            </result>
+        </action>
+
+        <action name="getEmployeesJson" class="com.example.action.GetEmployeesJsonAction">
+            <result type="json">
+                <param name="root">result</param>
+                <param name="excludeNullProperties">true</param>
+            </result>
+        </action>
+
+    </package>
 
 </struts>

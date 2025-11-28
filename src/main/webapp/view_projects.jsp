@@ -61,7 +61,7 @@
 
 			<a href="add_Project.jsp" class="btn btn-success">Add Project</a>
 			<div class="text-center mt-3">
-				<a href="admin_home.jsp" class="btn btn-secondary w-100">Back</a>
+				<a href="adminDashboard" class="btn btn-secondary w-100">Back</a>
 			</div>
 
 		</div>

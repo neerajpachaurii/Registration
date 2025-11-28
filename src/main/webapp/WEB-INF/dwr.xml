@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dwr>
+    <allowScriptTagRemoting>true</allowScriptTagRemoting>
+
+    <allow>
+        <create creator="spring" javascript="ProjectDwr">
+            <param name="beanName">projectDwr</param>
+        </create>
+
+        <create creator="spring" javascript="EmployeeDwr">
+            <param name="beanName">employeeDwr</param>
+        </create>
+    </allow>
+</dwr>

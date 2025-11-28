@@ -27,14 +27,36 @@ public class AddEmployeeAction extends ActionSupport {
         return SUCCESS;
     }
 
+//    public void validate() {
+//
+//        if (employee.getUsername() == null || employee.getUsername().trim().equals("")) {
+//            addFieldError("username", "Username required");
+//        }
+//
+//        if (service.employeeExists(employee.getUsername())) {
+//            addFieldError("username", "Username already exists");
+//        }
+//    } 
+//    islye htaya h kyuki ye jab run horha tha tb addEmployee.action se page crash horha tha but addEmployee.jsp likne
+//        se chlra tha index.jsp mein
+    
     public void validate() {
 
-        if (employee.getUsername() == null || employee.getUsername().trim().equals("")) {
-            addFieldError("username", "Username required");
+        if (employee == null) {
+            addActionError("Employee object is null");
+            return;
         }
 
-        if (service.employeeExists(employee.getUsername())) {
+        String username = employee.getUsername();
+
+        if (username == null || username.trim().isEmpty()) {
+            addFieldError("username", "Username required");
+            return;   // already null hai
+        }
+
+        if (service.employeeExists(username)) {
             addFieldError("username", "Username already exists");
         }
     }
+
 }
