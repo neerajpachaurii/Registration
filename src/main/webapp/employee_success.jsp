@@ -20,7 +20,7 @@
     <p><strong>Name:</strong> <%= emp.getName() %></p>
     <p><strong>Username:</strong> <%= emp.getUsername() %></p>
 
-    <a href="loginEmployee.jsp" class="btn btn-primary mt-3">Click Here to Login</a>
+    <a href="loginEmployee" class="btn btn-primary mt-3">Click Here to Login</a>
   </div>
 </div>
 
