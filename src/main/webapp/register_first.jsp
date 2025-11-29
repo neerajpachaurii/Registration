@@ -14,9 +14,9 @@
     <p>If you don't have an employee account yet, please register first.</p>
 
     <div class="d-grid gap-2">
-      <!-- Link to the admin/add-employee page where admin can create employee accounts -->
+   
       <a href="addEmployee.jsp" class="btn btn-success">Register Employee</a>
-      <!-- Or if you have a public registration page for employees -->
+     
       <a href="registration.jsp" class="btn btn-outline-primary">Or create user account</a>
       <a href="loginEmployee.jsp" class="btn btn-secondary">Back to Login</a>
     </div>

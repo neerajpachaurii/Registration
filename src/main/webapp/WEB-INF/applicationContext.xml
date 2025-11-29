@@ -108,15 +108,10 @@
     </bean>
 
 
-    <!-- ======================================================
-         DWR BEANS (Missing in your file — now added)
-         ====================================================== -->
-    <!-- ProjectDwr exposed for DWR -->
     <bean id="projectDwr" class="com.example.action.ProjectDwr">
         <property name="projectService" ref="projectService" />
     </bean>
 
-    <!-- EmployeeDwr exposed for DWR -->
     <bean id="employeeDwr" class="com.example.action.EmployeeDwr">
         <property name="employeeService" ref="employeeService" />
     </bean>

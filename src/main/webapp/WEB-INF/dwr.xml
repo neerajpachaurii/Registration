@@ -3,6 +3,8 @@
     <allowScriptTagRemoting>true</allowScriptTagRemoting>
 
     <allow>
+    
+      <convert converter="bean" match="com.example.model.Employee"/>
         <create creator="spring" javascript="ProjectDwr">
             <param name="beanName">projectDwr</param>
         </create>
