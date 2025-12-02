@@ -226,6 +226,7 @@
 package com.example.action;
 
 import java.io.ByteArrayInputStream;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -237,6 +238,7 @@ import com.example.model.Project;
 import com.example.service.EmployeeService;
 import com.example.service.ProjectService;
 import com.opensymphony.xwork2.ActionSupport;
+
 
 public class AdminDashboardAction extends ActionSupport {
 
@@ -462,7 +464,68 @@ public class AdminDashboardAction extends ActionSupport {
             return ERROR;
         }
     }
+ // PRINTING EMPLOYEE REPORT
+    @SuppressWarnings("unchecked")
+    public String printEmployeeReport() {
+        try {
+            // 1) security check: only ADMIN allowed
+            com.example.model.Employee admin =
+                    (com.example.model.Employee) ServletActionContext.getRequest().getSession()
+                            .getAttribute("loggedEmployee");
 
+            if (admin == null || !"ADMIN".equals(admin.getRole())) {
+                addActionError("Access Denied");
+                return ERROR;
+            }
+
+            // 2) ensure employeeService available
+            if (employeeService == null) {
+                throw new RuntimeException("REPORT ERROR: employeeService is null. Check Spring wiring.");
+            }
+
+            // 3) load JRXML from classpath
+            java.io.InputStream stream = Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("reports/employeeReport.jrxml");
+
+            if (stream == null) {
+                throw new RuntimeException("REPORT ERROR: JRXML not found at 'reports/employeeReport.jrxml'. Place employeeReport.jrxml under src/main/resources/reports/ and rebuild.");
+            }
+
+            // 4) compile report
+            net.sf.jasperreports.engine.JasperReport report =
+                    net.sf.jasperreports.engine.JasperCompileManager.compileReport(stream);
+
+            // 5) get data
+            java.util.List<com.example.model.Employee> list = employeeService.getAll();
+            if (list == null) list = new java.util.ArrayList<com.example.model.Employee>();
+
+            // 6) fill report (Java 7 safe)
+            net.sf.jasperreports.engine.JRDataSource ds =
+                    new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource(list);
+            java.util.HashMap params = new java.util.HashMap();
+
+            net.sf.jasperreports.engine.JasperPrint jp =
+                    net.sf.jasperreports.engine.JasperFillManager.fillReport(report, params, ds);
+
+            // 7) export PDF bytes
+            byte[] pdf = net.sf.jasperreports.engine.JasperExportManager.exportReportToPdf(jp);
+
+            // 8) write to response
+            javax.servlet.http.HttpServletResponse resp = ServletActionContext.getResponse();
+            resp.setContentType("application/pdf");
+            resp.setHeader("Content-Disposition", "attachment; filename=EmployeeReport.pdf");
+            resp.getOutputStream().write(pdf);
+            resp.getOutputStream().flush();
+
+            // 9) tell Struts no further result handling required
+            return NONE;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            addActionError("Failed to generate report: " + ex.getMessage());
+            return ERROR;
+        }
+    }
     // Helper method (Java 7 compatible)
     private String join(List<String> list, String sep) {
         StringBuilder sb = new StringBuilder();

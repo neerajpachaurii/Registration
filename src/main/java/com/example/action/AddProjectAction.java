@@ -73,7 +73,7 @@ public class AddProjectAction extends ActionSupport {
 		}
 		if (upload != null) {
 
-			String basePath = ServletActionContext.getServletContext().getRealPath("/uploads"); // .getRealPath("/uploads/project_files");
+			String basePath = ServletActionContext.getServletContext().getRealPath("/uploads/project_files");
 
 			File folder = new File(basePath);
 			if (!folder.exists())
@@ -82,11 +82,11 @@ public class AddProjectAction extends ActionSupport {
 			String uniqueName = System.currentTimeMillis() + "_" + uploadFileName;
 
 			File dest = new File(folder, uniqueName);
-
 			FileUtils.copyFile(upload, dest);
 
 			project.setFilename(uploadFileName);
 			project.setFilepath("uploads/project_files/" + uniqueName);
+
 		}
 
 		project.setOwner(emp);

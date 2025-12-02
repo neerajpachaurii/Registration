@@ -15,8 +15,8 @@
 
     <!-- Helpful links -->
     <p>
-      <a href="<s:url action='registrationPage'/>">Register</a> |
-      <a href="<s:url action='loginPage'/>">Back to Login</a>
+      <a href="<s:url action='addEmployee.action'/>">Register</a> |
+      <a href="<s:url action='loginEmployee.action'/>">Back to Login</a>
     </p>
   </div>
 </body>

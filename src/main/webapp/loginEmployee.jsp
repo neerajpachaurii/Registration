@@ -30,7 +30,7 @@
       <div class="mb-3">
         <label>Login As</label>
         <!-- This will set employee.role via ModelDriven -->
-        <s:select name="role" cssClass="form-control" list="{'USER','ADMIN'}" headerKey="" headerValue="-- Select Role --"/>
+        <s:select name="loginRole" cssClass="form-control" list="{'USER','ADMIN'}" headerKey="" headerValue="-- Select Role --"/>
       </div>
 
       <div class="d-grid gap-2">

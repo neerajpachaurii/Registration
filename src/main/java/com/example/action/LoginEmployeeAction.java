@@ -12,6 +12,8 @@ public class LoginEmployeeAction extends ActionSupport {
 	private String username;
 	private String password;
 	private EmployeeService employeeService;
+	private String loginRole;
+	
 
 	public void setUsername(String u) {
 		this.username = u;
@@ -25,6 +27,10 @@ public class LoginEmployeeAction extends ActionSupport {
 		this.employeeService = s;
 	}
 
+	public void setLoginRole(String loginRole) {
+	    this.loginRole = loginRole;
+	}
+	
 	@Override
 	public String execute() throws Exception {
 		Employee emp = employeeService.login(username, password);
@@ -38,6 +44,14 @@ public class LoginEmployeeAction extends ActionSupport {
 			addActionError("Access denied: your account has been deactivated by the administrator.");
 			return INPUT;
 		}
+		// Role match Checker
+		if (loginRole == null || loginRole.trim().isEmpty() ||
+			    !emp.getRole().equalsIgnoreCase(loginRole)) {
+
+			    addActionError("YOU HAVE NOT OPTED THE CORRECT ROLE CONTACT TO ADMIN");
+			    return ERROR;
+			}
+
 
 		HttpSession session = ServletActionContext.getRequest().getSession();
 		session.setAttribute("loggedEmployee", emp);
