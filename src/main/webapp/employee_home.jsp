@@ -109,11 +109,17 @@ if (emp == null) {
 
 								<td><s:if
 										test="#p.filepath != null && #p.filepath.trim().length() > 0">
-										<a
-											href="downloadProjectFile?filepath=<s:property value='#p.filepath'/>"
-											class="btn btn-sm btn-primary" target="_blank"> Download
-										</a>
+										<s:url id="fileUrl" action="downloadProjectFile">
+											<s:param name="fileName"
+												value="%{#p.filepath.substring(#p.filepath.lastIndexOf('/') + 1)}" />
+										</s:url>
+
+										<a href="<s:property value='%{fileUrl}'/>"
+											class="btn btn-sm btn-primary" target="_blank">Download</a>
+
+
 									</s:if></td>
+
 
 
 							</tr>

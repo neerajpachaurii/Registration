@@ -116,7 +116,7 @@ Ext.onReady(function () {
                         margin: "10 0",
                         cls: "custom-btn",
                         handler: function () {
-                            window.location.href = "addEmployee.jsp";
+                            window.location.href = "addEmployee.action";
                         }
                     },
                     {

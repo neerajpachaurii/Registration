@@ -228,7 +228,7 @@ function registerUsingDwr() {
                     <s:textfield id="salary" name="employee.salary" cssClass="form-control"/>
                 </div>
 
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <label class="form-label">Address</label>
                     <s:textfield id="address" name="employee.address" cssClass="form-control"/>
                 </div>
@@ -264,7 +264,7 @@ function registerUsingDwr() {
                 </div>
                 
                 
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <label class="form-label required">Password</label>
                     <s:password id="password" name="employee.password" cssClass="form-control"/>
                 </div>
